@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Registracija
+{% endblock %}
+
+{% block main %}
+    <p>Za registracijo spodaj vpišite zahtevane podatke</p>
+    <div class="container">
+        <form action="/registration" method="POST">
+            <label for="fname">Ime:</label>
+            <input type="text" name="fname" value="Janez">
+            <label for="lname">Priimek:</label>
+            <input type="text" name="lname" value="Novak">
+            <label for="email">E-pošta:</label>
+            <input type="email" name="email" value="example@example.com">
+            <label for="username">Uporabniško ime:</label>
+            <input type="text" name="username" value="jnovak">
+            <label for="password">Geslo:</label>
+            <input type="password" name="password" value="Geslo">
+            <button type="submit" name="submit" value="submit">Potrdi</button>
+        </form>
+    </div>
+{% endblock %}
