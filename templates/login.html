@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Vpis
+{% endblock %}
+
+{% block main %}
+    <h1>Vpis</h1><br>
+    <div class="container">
+        <form action="/login" method="POST">
+            <label for="username">Uporabniško ime:</label><br>
+            <input autocomplete="off" type="text" name="username"><br><br>
+            <label for="password">Geslo:</label><br>
+            <input type="password" name="password"><br><br>
+            <input type="submit" name="submit">
+        </form>
+    </div>
+{% endblock %}

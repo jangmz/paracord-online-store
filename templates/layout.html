@@ -17,14 +17,14 @@
     <!-- navigation bar -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color: #7497af;">
         <div class="container-fluid">
-          <a class="navbar-brand" href="index.html">Vozlarnica</a>
+          <a class="navbar-brand" href="/">Vozlarnica</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a class="nav-link" href="index.html">Domov</a>
+                <a class="nav-link" href="/">Domov</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">Zapestnice</a>
@@ -40,14 +40,14 @@
                     <a class="nav-link" href="#">Moj profil</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Odjava</a>
+                  <a class="nav-link" href="/logout">Odjava</a>
               </li>
               {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Login</a>
+                    <a class="nav-link" href="/login">Prijava</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Register</a>
+                    <a class="nav-link" href="/registration">Registracija</a>
                 </li>
               {% endif %}
               <li class="nav-item">
