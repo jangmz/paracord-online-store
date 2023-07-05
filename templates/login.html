@@ -5,17 +5,18 @@
 {% endblock %}
 
 {% block main %}
-    <h1>Prijava</h1><br>
+    <h1>Log In</h1><br>
     {% if error_msg %}
         <div class="alert alert-danger">
             {{ error_msg }}
         </div><br>
     {% endif %}
+
     <div class="container">
         <form action="/login" method="POST">
-            <label for="username">Uporabniško ime:</label><br>
+            <label for="username">Username:</label><br>
             <input autocomplete="off" type="text" name="username"><br><br>
-            <label for="password">Geslo:</label><br>
+            <label for="password">Password:</label><br>
             <input type="password" name="password"><br><br>
             <input type="submit" name="submit">
         </form>

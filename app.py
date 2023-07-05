@@ -1,4 +1,5 @@
 import os
+import sys
 import sqlite3
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
@@ -93,14 +94,24 @@ def login():
 
         # query username
         row = cur.execute("SELECT * FROM users WHERE username = ?",(username,)).fetchone()
-        if not row or not check_password_hash(rows[0]["hash"], password):
+        
+        # print(f"======= {row['username']} =======", file=sys.stderr)
+        
+        if not row or not check_password_hash(row["hash"], password):
             error_msg = "Invalid username or password!"
             return render_template("login.html", error_msg=error_msg)
-        # continue here *****************************************
+        
+        # remember user that is logged in
+        session["user_id"] = row["id"]
+        
+        return redirect("/")
     return render_template("login.html")
 
 
 @app.route("/logout")
 def logout():
+    # forget user id
     session.clear()
+
+    # redirect to login
     return redirect("login")

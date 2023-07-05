@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,37 +17,34 @@
     <!-- navigation bar -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color: #7497af;">
         <div class="container-fluid">
-          <a class="navbar-brand" href="/">Vozlarnica</a>
+          <a class="navbar-brand" href="/">Knotted Shop</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a class="nav-link" href="/">Domov</a>
+                <a class="nav-link" href="/">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Zapestnice</a>
+                <a class="nav-link" href="#">Bracelets</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Ustvari zapestnico</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Kontakt</a>
+                <a class="nav-link" href="#">Contact</a>
               </li>
               {% if session["user_id"] %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Moj profil</a>
+                    <a class="nav-link" href="/profile">My Profile</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="/logout">Odjava</a>
+                  <a class="nav-link" href="/logout">Log Out</a>
               </li>
               {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="/login">Prijava</a>
+                    <a class="nav-link" href="/login">Log In</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/registration">Registracija</a>
+                    <a class="nav-link" href="/registration">Registration</a>
                 </li>
               {% endif %}
               <li class="nav-item">
