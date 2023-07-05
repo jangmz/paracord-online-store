@@ -1,6 +1,7 @@
 import os
 import sys
 import sqlite3
+from datetime import date
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
@@ -59,10 +60,11 @@ def registration():
         cur = conn.cursor()
 
         # check if username or email already exist
-        row = cur.execute("SELECT username FROM users WHERE username = ?;", (username,)).fetchone()
-        row2 = cur.execute("SELECT email FROM users WHERE email = ?;", (email,)).fetchone()
-        if row or row2:
-            error_msg = "Username/e-mail already exists, please a different username/e-mail"
+        row = cur.execute("SELECT * FROM users WHERE username = ?;", (username,)).fetchone()
+
+        if row:
+            error_msg = "Username already exists, please a different username"
+            conn.close()
             return render_template("registration.html", error_msg=error_msg)
         else:
             # insert user into database
@@ -72,8 +74,10 @@ def registration():
                 conn.commit()
             except:
                 error_msg = "Error inserting into database"
+                conn.close()
                 return render_template("registration.html", error_msg=error_msg)
-            return redirect("/")
+            conn.close()
+            return redirect("login")
     return render_template("registration.html")
 
 
@@ -99,11 +103,19 @@ def login():
         
         if not row or not check_password_hash(row["hash"], password):
             error_msg = "Invalid username or password!"
+            conn.close()
             return render_template("login.html", error_msg=error_msg)
         
         # remember user that is logged in
         session["user_id"] = row["id"]
-        
+        try:
+            cur.execute("UPDATE users SET last_login_date = ? WHERE id = ?", (date.today(), session["user_id"]))
+            conn.commit()
+        except:
+            error_msg = "Couldn't update login time"
+            conn.close()
+            return render_template("login.html", error_msg=error_msg)
+        conn.close()
         return redirect("/")
     return render_template("login.html")
 
@@ -115,3 +127,29 @@ def logout():
 
     # redirect to login
     return redirect("login")
+
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    # if "GET" display all the information the DB has on the user
+    if request.method == "GET":
+        # connect DB
+        conn = get_database_connection()
+        cur = conn.cursor()
+
+        # get user info
+        user_data = cur.execute("SELECT first_name, last_name, username, email FROM users WHERE id = ?;", (session["user_id"]))
+        
+        conn.close()
+        return render_template("profile.html", user_data=user_data)
+    # if "POST" update user information
+    if request.method == "POST":
+        return render_template("profile.html")
+    
+
+@app.route("/insert_address", methods=["GET", "POST"])
+def insert_address():
+    # GET -> display form 
+
+    # POST -> insert into DB
+    return render_template("/")

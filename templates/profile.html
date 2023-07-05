@@ -13,6 +13,24 @@
     {% endif %}
 
     <div class="container">
-    
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">First name</th>
+                    <th scope="col">Last name</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">E-mail</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for data in user_data %}
+                        <!-- finish this table-->
+                            <td>data</td>
+                    {% endfor %}
+                </tr>
+            </tbody>            
+        </table>
+
     </div>
 {% endblock %}
