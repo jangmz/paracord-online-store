@@ -5,7 +5,12 @@
 {% endblock %}
 
 {% block main %}
-    <h1>Vpis</h1><br>
+    <h1>Prijava</h1><br>
+    {% if error_msg %}
+        <div class="alert alert-danger">
+            {{ error_msg }}
+        </div><br>
+    {% endif %}
     <div class="container">
         <form action="/login" method="POST">
             <label for="username">Uporabniško ime:</label><br>

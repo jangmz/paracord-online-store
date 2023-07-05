@@ -78,6 +78,25 @@ def registration():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # check if fields are empty
+        if not username or not password:
+            error_msg = "Please input username or/and password."
+            return render_template("login.html", error_msg=error_msg)
+        
+        # DB connection
+        conn = get_database_connection()
+        cur = conn.cursor()
+
+        # query username
+        row = cur.execute("SELECT * FROM users WHERE username = ?",(username,)).fetchone()
+        if not row or not check_password_hash(rows[0]["hash"], password):
+            error_msg = "Invalid username or password!"
+            return render_template("login.html", error_msg=error_msg)
+        # continue here *****************************************
     return render_template("login.html")
 
 
