@@ -23,8 +23,10 @@ def after_request(response):
     return response
 
 # connect database
-conn = sqlite3.connect("bracelets.db")
-cur = conn.cursor()
+def get_database_connection():
+    conn = sqlite3.connect("paracord.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
 @app.route("/")
 def home():
@@ -51,16 +53,25 @@ def registration():
             error_msg = "Please fill out all fields"
             return render_template("registration.html", error_msg=error_msg)
 
+        # create cursor from DB connection
+        conn = get_database_connection()
+        cur = conn.cursor()
+
         # check if username or email already exist
-        row = cur.execute("SELECT username FROM users WHERE username = ?;", username)
-        row2 = cur.execute("SELECT email FROM users WHERE email = ?;", email)
+        row = cur.execute("SELECT username FROM users WHERE username = ?;", (username,)).fetchone()
+        row2 = cur.execute("SELECT email FROM users WHERE email = ?;", (email,)).fetchone()
         if row or row2:
             error_msg = "Username/e-mail already exists, please a different username/e-mail"
             return render_template("registration.html", error_msg=error_msg)
         else:
             # insert user into database
             hash = generate_password_hash(password, method='sha256')
-            cur.execute("INSERT INTO users (first_name, last_name, username, hash, email) VALUES (?, ?, ?, ?, ?);", fname, lname, username, hash, email)
+            try:
+                cur.execute("INSERT INTO users (first_name, last_name, username, hash, email) VALUES (?, ?, ?, ?, ?);", (fname, lname, username, hash, email))
+                conn.commit()
+            except:
+                error_msg = "Error inserting into database"
+                return render_template("registration.html", error_msg=error_msg)
             return redirect("/")
     return render_template("registration.html")
 
