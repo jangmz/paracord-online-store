@@ -157,6 +157,7 @@ def profile():
             error_msg = "If you want to change data, you have to input some information"
             return render_template("profile.html", user_data=user_data, error_msg=error_msg)
         
+        # check which field to update
         if fname:
             cur.execute("UPDATE users SET first_name = ? WHERE id = ?", (fname, session["user_id"]))
             conn.commit()
@@ -189,3 +190,12 @@ def insert_address():
 
     # POST -> insert into DB
     return render_template("/")
+
+@app.route("/products")
+def products():
+    # connect DB
+    conn = get_database_connection()
+    cur = conn.cursor()
+
+    rows = cur.execute("SELECT * FROM products;").fetchall()
+    return render_template("products.html", rows=rows)

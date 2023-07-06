@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Bracelets
+{% endblock %}
+
+{% block main %}
+    <h1>Bracelets</h1><br>
+    <div class="container">
+        <div class="row">
+        {% for row in rows %}
+                <div class="col-sm">
+                    <img src="{{ url_for('static', filename=row['id'] ~ '.jpg') }}" alt="1" class="img-thumbnail"><br><br>
+                    <p><strong>{{ row['name'] }}</strong></p>
+                    <p>{{ row['descr'] }}</p>
+                    <p>${{ row['price'] }}</p>
+                    <p>Available: {{ row['quantity'] }}</p>
+                </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endblock %}
