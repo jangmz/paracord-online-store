@@ -13,9 +13,11 @@
     {% endif %}
 
     <div class="container">
+        <form action="profile" method="POST">
         <table class="table">
             <thead>
                 <tr>
+                    <th scope="col">&nbsp;</th>
                     <th scope="col">First name</th>
                     <th scope="col">Last name</th>
                     <th scope="col">Username</th>
@@ -24,13 +26,23 @@
             </thead>
             <tbody>
                 <tr>
-                    {% for data in user_data %}
-                        <!-- finish this table-->
-                            <td>data</td>
-                    {% endfor %}
+                    <th scope="row">Current info</th>
+                    <td>{{ user_data[0]["first_name"] }}</td>
+                    <td>{{ user_data[0]["last_name"] }}</td>
+                    <td>{{ user_data[0]["username"] }}</td>
+                    <td>{{ user_data[0]["email"] }}</td>
                 </tr>
-            </tbody>            
+                <tr>
+                    <th scope="row">New info</th>
+                    
+                        <td><input type="text" name="fname"></td>
+                        <td><input type="text" name="lname"></td>
+                        <td><input type="text" name="username"></td>
+                        <td><input type="text" name="email"></td>
+                </tr>
+            </tbody>
         </table>
-
+        <button type="submit" name="submit">Change data</button>
+        </form>
     </div>
 {% endblock %}

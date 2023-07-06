@@ -138,12 +138,48 @@ def profile():
         cur = conn.cursor()
 
         # get user info
-        user_data = cur.execute("SELECT first_name, last_name, username, email FROM users WHERE id = ?;", (session["user_id"]))
-        
+        user_data = cur.execute("SELECT first_name, last_name, username, email FROM users WHERE id = ?;", (session["user_id"],)).fetchall()
         conn.close()
+        #print(f"======= {user_data[0]['first_name']} =======", file=sys.stderr)
         return render_template("profile.html", user_data=user_data)
     # if "POST" update user information
     if request.method == "POST":
+        fname = request.form.get("fname")
+        lname = request.form.get("lname")
+        username = request.form.get("username")
+        email = request.form.get("email")
+
+        conn = get_database_connection()
+        cur = conn.cursor()
+        user_data = cur.execute("SELECT first_name, last_name, username, email FROM users WHERE id = ?;", (session["user_id"],)).fetchall()
+        # if all the fields are empty
+        if not fname and not lname and not username and not email:
+            error_msg = "If you want to change data, you have to input some information"
+            return render_template("profile.html", user_data=user_data, error_msg=error_msg)
+        
+        if fname:
+            cur.execute("UPDATE users SET first_name = ? WHERE id = ?", (fname, session["user_id"]))
+            conn.commit()
+            return redirect("profile")
+        if lname:
+            cur.execute("UPDATE users SET last_name = ? WHERE id = ?", (lname, session["user_id"]))
+            conn.commit()
+            return redirect("profile")
+        if username:
+            row = cur.execute("SELECT username FROM users WHERE username = ?", (username,)).fetchone()
+            if row:
+                return render_template("profile.html", user_data=user_data, error_msg="Username already exists!")
+            cur.execute("UPDATE users SET username = ? WHERE id = ?", (username, session["user_id"]))
+            conn.commit()
+            return redirect("profile")
+        if email:
+            row = cur.execute("SELECT username FROM users WHERE username = ?", (username,)).fetchone()
+            if row:
+                return render_template("profile.html", user_data=user_data, error_msg="This e-mail is already registered!")
+            cur.execute("UPDATE users SET email = ? WHERE id = ?", (email, session["user_id"]))
+            conn.commit()
+            return redirect("profile")
+        
         return render_template("profile.html")
     
 
