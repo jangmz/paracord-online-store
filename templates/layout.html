@@ -22,7 +22,7 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto">
               <li class="nav-item">
                 <a class="nav-link" href="/">Home</a>
               </li>
@@ -32,24 +32,26 @@
               <li class="nav-item">
                 <a class="nav-link" href="#">Contact</a>
               </li>
+            </ul>
               {% if session["user_id"] %}
-                <li class="nav-item">
-                    <a class="nav-link" href="/profile">My Profile</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/logout">Log Out</a>
-              </li>
+                <ul class="navbar-nav ms-auto">
+                  <li class="nav-item">
+                      <a class="nav-link" href="/profile">My Profile</a>
+                  </li>
+                  <li class="nav-item ">
+                    <a class="nav-link" href="/logout">Log Out</a>
+                  </li>
+                </ul>
               {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Log In</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/registration">Registration</a>
-                </li>
+                <ul class="navbar-nav ms-auto">
+                  <li class="nav-item">
+                      <a class="nav-link" href="/login">Log In</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="/registration">Registration</a>
+                  </li>
+                </ul>
               {% endif %}
-              <li class="nav-item">
-                <a class="nav-link" href="#"></a>
-              </li>
             </ul>
           </div>
         </div>
