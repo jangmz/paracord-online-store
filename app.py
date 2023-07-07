@@ -239,3 +239,7 @@ def cart():
         JOIN users ON cart.user_id = users.id
         WHERE users.id = 1;""").fetchone()
     return render_template("cart.html", cart_data=cart_data, total_amount=total)
+
+@app.route("/order")
+def order():
+    return render_template("ordered.html")
