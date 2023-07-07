@@ -220,3 +220,22 @@ def add_to_cart():
     conn.close()
     #print(f"======= VALUE OF ALERT: TRUE =======", file=sys.stderr)
     return render_template("products.html")
+
+
+@app.route("/cart")
+def cart():
+    # display cart from DB
+    conn = get_database_connection()
+    cur = conn.cursor()
+    cart_data = cur.execute("""SELECT products.name, SUM(cart.quantity) AS quantity, products.price
+        FROM products
+        JOIN cart ON products.id = cart.product_id
+        JOIN users ON cart.user_id = users.id
+        WHERE users.id = 1
+        GROUP BY products.name;""").fetchall()
+    total = cur.execute("""SELECT SUM(products.price) AS total_amount
+        FROM products
+        JOIN cart ON products.id = cart.product_id
+        JOIN users ON cart.user_id = users.id
+        WHERE users.id = 1;""").fetchone()
+    return render_template("cart.html", cart_data=cart_data, total_amount=total)

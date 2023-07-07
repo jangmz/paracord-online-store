@@ -5,20 +5,28 @@
 {% endblock %}
 
 {% block main %}
-    <script src="/static/script.js"></script>
-    <h1>Bracelets</h1><br>
+    <h1>Cart</h1><br>
     <div class="container">
-        <div class="row">
-        {% for row in rows %}
-                <div class="col-sm">
-                    <img src="{{ url_for('static', filename=row['id'] ~ '.jpg') }}" alt="1" class="img-thumbnail"><br><br>
-                    <p><strong>{{ row['name'] }}</strong></p>
-                    <p>{{ row['descr'] }}</p>
-                    <p>${{ row['price'] }}</p>
-                    <p>Available: {{ row['quantity'] }}</p>
-                    <button type="submit" name="addtocart" class="add-to-cart-btn" data-product-id="{{ row['id'] }}" data-product-name="{{ row['name'] }}" data-product-price="{{ row['price'] }}" data-product-quantity="{{ row['quantity'] }}">Add to Cart</button>
-                </div>
-        {% endfor %}
-        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Bracelet</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Price per bracelet</th>
+                    <th scope="col">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in cart_data %}
+                    <tr>
+                        <td>{{ product["name"] }}</td>
+                        <td>{{ product["quantity"] }}</td>
+                        <td>{{ product["price"] }}</td>
+                        <td>{{ product["quantity"] * product["price"] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p>Total amount: ${{ total_amount["total_amount"] }}</p>
     </div>
 {% endblock %}
