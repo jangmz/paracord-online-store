@@ -6,6 +6,11 @@
 
 {% block main %}
     <h1>Cart</h1><br>
+    {% if error_msg %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_msg }}
+        </div><br>
+    {% endif %}
     <div class="container">
         <table class="table">
             <thead>
@@ -42,6 +47,8 @@
         </table>
         <p>Total amount: <strong>${{ total_amount }}</strong></p>
         <p>Cash available: <strong>${{ cash }}</strong></p>
-        <button type="submit" name="order" action="/order">Order now</button>
+        <form action="/order" method="POST">
+            <button type="submit">Order now</button>
+        </form> 
     </div>
 {% endblock %}

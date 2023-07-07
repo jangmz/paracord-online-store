@@ -296,4 +296,61 @@ def order():
         return render_template("ordered.html")
     # if order button is clicked in cart page
     if request.method == "POST":
+        # 1. connect to DB
+        conn = get_database_connection()
+        cur = conn.cursor()
+
+        # 2. check if user has enough cash to buy
+        # total amount of products in the cart
+        rows = cur.execute("""SELECT products.price, cart.quantity
+            FROM products
+            JOIN cart ON products.id = cart.product_id
+            JOIN users ON cart.user_id = users.id
+            WHERE users.id = ?""", (session['user_id'],)).fetchall()
+        total_amount = 0
+        for row in rows:
+            total_amount += row['price'] * row['quantity']
+
+        # check user cash
+        row = cur.execute("SELECT cash FROM users WHERE id = ?;", (session["user_id"], )).fetchone()
+        cash_left = row['cash'] - total_amount
+        if cash_left < 0:
+            error_msg = "Not enough cash!"
+            conn.close()
+            return render_template("cart.html", error_msg=error_msg)
+        
+        # 3. check if there is enough stock of the product
+        rows_cart = cur.execute("SELECT * FROM cart WHERE user_id = ?", (session['user_id'],))
+        for product in rows_cart:
+            rows_stock = cur.execute("SELECT quantity FROM products WHERE id = ?", (product['product_id'],)).fetchone()
+            #print(f"======= PROD QUANT: {product['quantity']} || STOCK: {rows_stock['quantity']} =======", file=sys.stderr)
+            if product['quantity'] > rows_stock['quantity']:
+                error_msg = "Lower the quantity of the product/s!"
+                conn.close()
+                return render_template("cart.html", error_msg=error_msg)
+            
+        # 4. change the stock in the shop for the bought products
+        for product in rows_cart:
+            rows_stock = cur.execute("SELECT quantity FROM products WHERE id = ?", (product['product_id'],)).fetchone()
+            cur.execute("UPDATE products SET quantity = ? WHERE product_id = ?", (rows_stock['quantity'] - product['quantity'],product['product_id']))
+            conn.commit()
+
+        # 5. update users cash
+        cur.execute("UPDATE users SET cash = ? WHERE id = ?", (cash_left, session['user_id']))
+        conn.commit()
+
+        # 6. add input to "order" table
+        cur.execute("INSERT INTO orders (user_id, total_amount, status) VALUES (?, ?, ?)", (session['user_id'], total_amount, "bought"))
+        conn.commit()
+
+        # 7. add input to "order_item" table
+        # get id of the latest order in table
+        order = cur.execute("SELECT id FROM orders ORDER BY created_at DESC").fetchone()
+        for product in rows_cart:
+            prod = cur.execute("SELECT price FROM products WHERE id = ?", (product['product_id'],)).fetchone()
+            cur.execute("INSERT INTO order_item (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)", (order['id'], product['product_id'], product['quantity'], prod['price']))
+            conn.commit()
+        
+        # 8. empty the current cart for the user
+
         return render_template("ordered.html")
