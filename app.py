@@ -198,4 +198,25 @@ def products():
     cur = conn.cursor()
 
     rows = cur.execute("SELECT * FROM products;").fetchall()
+    conn.close()
     return render_template("products.html", rows=rows)
+
+
+@app.route("/add_to_cart", methods=["POST"])
+def add_to_cart():
+    # gather data from the product
+    data = request.get_json()
+    productID = data["productId"]
+    #productName = data["productName"]
+    #productPrice = data["productPrice"]
+    #productQuantity = data["productQuantity"]
+
+    # add to DB
+    conn = get_database_connection()
+    cur = conn.cursor()
+    cur.execute("""INSERT INTO cart(user_id, product_id, quantity, created_at, is_ordered)
+        VALUES (?, ?, ?, ?, ?);""", (session["user_id"], productID, 1, date.today(), 0))
+    conn.commit()
+    conn.close()
+    #print(f"======= VALUE OF ALERT: TRUE =======", file=sys.stderr)
+    return render_template("products.html")
