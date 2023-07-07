@@ -227,19 +227,47 @@ def cart():
     # display cart from DB
     conn = get_database_connection()
     cur = conn.cursor()
-    cart_data = cur.execute("""SELECT products.name, SUM(cart.quantity) AS quantity, products.price
+    cart_data = cur.execute("""SELECT products.id AS id, products.name, SUM(cart.quantity) AS quantity, products.price
         FROM products
         JOIN cart ON products.id = cart.product_id
         JOIN users ON cart.user_id = users.id
         WHERE users.id = 1
         GROUP BY products.name;""").fetchall()
+    
+    # get the total amount of products in the cart
     total = cur.execute("""SELECT SUM(products.price) AS total_amount
         FROM products
         JOIN cart ON products.id = cart.product_id
         JOIN users ON cart.user_id = users.id
         WHERE users.id = 1;""").fetchone()
-    return render_template("cart.html", cart_data=cart_data, total_amount=total)
+    
+    # get cash amount available
+    row = cur.execute("SELECT cash FROM users WHERE id = ?;", (session["user_id"], )).fetchone()
+    
+    #cart data and total amount sent to the page
+    conn.close()
+    return render_template("cart.html", cart_data=cart_data, total_amount=total, cash=row["cash"])
 
-@app.route("/order")
+
+@app.route("/remove_product", methods=["POST"])
+def remove_product():
+    if request.method == "POST":
+        product_id = request.form.get("product_id")
+        
+        # remove from DB cart
+        conn = get_database_connection()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM cart WHERE product_id = ?;", (product_id,))
+        conn.commit()
+        conn.close()
+
+        return redirect("cart")
+
+
+@app.route("/order", methods=["GET", "POST"])
 def order():
-    return render_template("ordered.html")
+    if request.method == "GET":
+        return render_template("ordered.html")
+    # if order button is clicked in cart page
+    if request.method == "POST":
+        return render_template("ordered.html")

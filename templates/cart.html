@@ -14,6 +14,7 @@
                     <th scope="col">Quantity</th>
                     <th scope="col">Price per bracelet</th>
                     <th scope="col">Price</th>
+                    <th scope="col">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,10 +24,18 @@
                         <td>{{ product["quantity"] }}</td>
                         <td>{{ product["price"] }}</td>
                         <td>{{ product["quantity"] * product["price"] }}</td>
+                        <td>
+                            <form action="/remove_product" method="POST">
+                                <input type="hidden" name="product_id" value="{{ product['id'] }}">
+                                <button type="submit">Remove</button>
+                            </form>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <p>Total amount: ${{ total_amount["total_amount"] }}</p>
+        <p>Total amount: <strong>${{ total_amount["total_amount"] }}</strong></p>
+        <p>Cash available: <strong>${{ cash }}</strong></p>
+        <button type="submit" name="order" action="/order">Order now</button>
     </div>
 {% endblock %}
