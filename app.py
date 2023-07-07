@@ -214,8 +214,16 @@ def add_to_cart():
     # add to DB
     conn = get_database_connection()
     cur = conn.cursor()
-    cur.execute("""INSERT INTO cart(user_id, product_id, quantity, created_at, is_ordered)
-        VALUES (?, ?, ?, ?, ?);""", (session["user_id"], productID, 1, date.today(), 0))
+    
+    # check if product is already in cart
+    row = cur.execute("SELECT * FROM cart WHERE product_id = ? AND user_id = ?", (productID, session["user_id"])).fetchone()
+    if row:
+        # if yes -> update the cart
+        cur.execute("UPDATE cart SET quantity = ? WHERE product_id = ? AND user_id = ?", (row["quantity"] + 1, productID, session['user_id']))
+    else:
+        # if not -> create an entry
+        cur.execute("""INSERT INTO cart(user_id, product_id, quantity, created_at, is_ordered)
+            VALUES (?, ?, ?, ?, ?);""", (session["user_id"], productID, 1, date.today(), 0))
     conn.commit()
     conn.close()
     #print(f"======= VALUE OF ALERT: TRUE =======", file=sys.stderr)
@@ -235,11 +243,14 @@ def cart():
         GROUP BY products.name;""").fetchall()
     
     # get the total amount of products in the cart
-    total = cur.execute("""SELECT SUM(products.price) AS total_amount
+    rows = cur.execute("""SELECT products.price, cart.quantity
         FROM products
         JOIN cart ON products.id = cart.product_id
         JOIN users ON cart.user_id = users.id
-        WHERE users.id = 1;""").fetchone()
+        WHERE users.id = ?""", (session['user_id'],)).fetchall()
+    total = 0
+    for row in rows:
+        total += row['price'] * row['quantity']
     
     # get cash amount available
     row = cur.execute("SELECT cash FROM users WHERE id = ?;", (session["user_id"], )).fetchone()
@@ -261,6 +272,21 @@ def remove_product():
         conn.commit()
         conn.close()
 
+        return redirect("cart")
+    
+
+@app.route("/update_quantity", methods=["POST"])
+def update_quantity():
+    if request.method == "POST":
+        product_id = request.form.get("product_id")
+        quantity = request.form.get("quantity")
+
+        # update quantity in the DB
+        conn = get_database_connection()
+        cur = conn.cursor()
+        cur.execute ("UPDATE cart SET quantity = ? WHERE product_id = ?", (quantity, product_id))
+        conn.commit()
+        conn.close()
         return redirect("cart")
 
 

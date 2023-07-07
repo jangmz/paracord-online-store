@@ -21,9 +21,15 @@
                 {% for product in cart_data %}
                     <tr>
                         <td>{{ product["name"] }}</td>
-                        <td>{{ product["quantity"] }}</td>
-                        <td>{{ product["price"] }}</td>
-                        <td>{{ product["quantity"] * product["price"] }}</td>
+                        <td>
+                            <form action="/update_quantity" method="POST">
+                                <input type="hidden" name="product_id" value="{{ product['id'] }}">
+                                <input type="number" name="quantity" value="{{ product['quantity'] }}" min="1">
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
+                        <td>${{ product["price"] }}</td>
+                        <td>${{ product["quantity"] * product["price"] }}</td>
                         <td>
                             <form action="/remove_product" method="POST">
                                 <input type="hidden" name="product_id" value="{{ product['id'] }}">
@@ -34,7 +40,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <p>Total amount: <strong>${{ total_amount["total_amount"] }}</strong></p>
+        <p>Total amount: <strong>${{ total_amount }}</strong></p>
         <p>Cash available: <strong>${{ cash }}</strong></p>
         <button type="submit" name="order" action="/order">Order now</button>
     </div>
