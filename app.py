@@ -1,6 +1,7 @@
 import os
 import sys
 import sqlite3
+import pprint
 from datetime import date
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
@@ -292,14 +293,21 @@ def update_quantity():
 
 @app.route("/order", methods=["GET", "POST"])
 def order():
+    # 1. connect to DB
+    conn = get_database_connection()
+    cur = conn.cursor()
     if request.method == "GET":
-        return render_template("ordered.html")
+        # get order history data - date, product, quantity, price
+        history = cur.execute("""SELECT orders.created_at AS order_date, products.name AS product_name, order_item.quantity AS quantity, order_item.price AS price
+            FROM orders
+            JOIN order_item ON orders.id = order_item.order_id
+            JOIN products ON order_item.product_id = products.id
+            WHERE orders.user_id = ?
+            ORDER BY order_date DESC;
+            """, (session['user_id'],))
+        return render_template("ordered.html", history=history)
     # if order button is clicked in cart page
     if request.method == "POST":
-        # 1. connect to DB
-        conn = get_database_connection()
-        cur = conn.cursor()
-
         # 2. check if user has enough cash to buy
         # total amount of products in the cart
         rows = cur.execute("""SELECT products.price, cart.quantity
@@ -320,7 +328,7 @@ def order():
             return render_template("cart.html", error_msg=error_msg)
         
         # 3. check if there is enough stock of the product
-        rows_cart = cur.execute("SELECT * FROM cart WHERE user_id = ?", (session['user_id'],))
+        rows_cart = cur.execute("SELECT * FROM cart WHERE user_id = ?", (session['user_id'],)).fetchall()
         for product in rows_cart:
             rows_stock = cur.execute("SELECT quantity FROM products WHERE id = ?", (product['product_id'],)).fetchone()
             #print(f"======= PROD QUANT: {product['quantity']} || STOCK: {rows_stock['quantity']} =======", file=sys.stderr)
@@ -332,7 +340,8 @@ def order():
         # 4. change the stock in the shop for the bought products
         for product in rows_cart:
             rows_stock = cur.execute("SELECT quantity FROM products WHERE id = ?", (product['product_id'],)).fetchone()
-            cur.execute("UPDATE products SET quantity = ? WHERE product_id = ?", (rows_stock['quantity'] - product['quantity'],product['product_id']))
+            #print(f"======= PROD keys: {product.keys()} || STOCK: {rows_stock['quantity']} =======", file=sys.stderr)
+            cur.execute("UPDATE products SET quantity = ? WHERE id = ?", (rows_stock['quantity'] - product['quantity'], product['product_id']))
             conn.commit()
 
         # 5. update users cash
@@ -346,11 +355,14 @@ def order():
         # 7. add input to "order_item" table
         # get id of the latest order in table
         order = cur.execute("SELECT id FROM orders ORDER BY created_at DESC").fetchone()
+        #print(f"****************** OBJECT = {rows_cart['product_id']} *******************", file = sys.stderr)
         for product in rows_cart:
             prod = cur.execute("SELECT price FROM products WHERE id = ?", (product['product_id'],)).fetchone()
             cur.execute("INSERT INTO order_item (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)", (order['id'], product['product_id'], product['quantity'], prod['price']))
             conn.commit()
         
         # 8. empty the current cart for the user
+        cur.execute("DELETE FROM cart WHERE user_id = ?", (session['user_id'],))
+        conn.commit()
 
-        return render_template("ordered.html")
+        return redirect("order")

@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    My orders
+{% endblock %}
+
+{% block main %}
+    <script src="/static/script.js"></script>
+    <h1>My orders</h1><br>
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in history %}
+                    <tr>
+                        <td>{{ row['order_date'] }}</td>
+                        <td>{{ row['product_name'] }}</td>
+                        <td>{{ row['quantity'] }}</td>
+                        <td>{{ row['price'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
