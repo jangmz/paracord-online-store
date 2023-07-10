@@ -240,8 +240,8 @@ def cart():
         FROM products
         JOIN cart ON products.id = cart.product_id
         JOIN users ON cart.user_id = users.id
-        WHERE users.id = 1
-        GROUP BY products.name;""").fetchall()
+        WHERE users.id = ?
+        GROUP BY products.name;""", (session['user_id'])).fetchall()
     
     # get the total amount of products in the cart
     rows = cur.execute("""SELECT products.price, cart.quantity
