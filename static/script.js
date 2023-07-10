@@ -14,6 +14,10 @@ document.addEventListener("DOMContentLoaded", function() {
         var productPrice = button.dataset.productPrice;
         var productQuantity = button.dataset.productQuantity;
 
+        if (productQuantity === "0") {
+            showAlert("The product is out of stock! Cannot add to cart.");
+            return;
+        }
         // data object to send in the AJAX request
         var data = {
             productId: productId,
