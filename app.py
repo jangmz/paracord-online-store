@@ -236,12 +236,11 @@ def cart():
     # display cart from DB
     conn = get_database_connection()
     cur = conn.cursor()
-    cart_data = cur.execute("""SELECT products.id AS id, products.name, SUM(cart.quantity) AS quantity, products.price
+    cart_data = cur.execute("""SELECT products.id AS id, products.name, cart.quantity AS quantity, products.price
         FROM products
         JOIN cart ON products.id = cart.product_id
         JOIN users ON cart.user_id = users.id
-        WHERE users.id = ?
-        GROUP BY products.name;""", (session['user_id'])).fetchall()
+        WHERE users.id = ?""", (session['user_id'],)).fetchall()
     
     # get the total amount of products in the cart
     rows = cur.execute("""SELECT products.price, cart.quantity
